@@ -328,27 +328,6 @@ function _M.init(conf)
 end
 
 -- Round robin
-function _M.round_robin_server(name)
-
-    if not _M.ready or not _M.data[name] then
-        return nil, "upstream not ready."
-    end
-
-    local c = _M.conf.dict
-    local c_key = name .. "_count"
-    local count, err = c:incr(c_key, 1)
-    if err == "not found" then
-        count = 1
-        ok = c:set(c_key, 1)
-        if not ok then
-            _M.data[name].count = _M.data[name].count + 1
-            count = _M.data[name].count
-        end
-    end
-    local pick = count % #_M.data[name].servers
-    return _M.data[name].servers[pick + 1]
-end
-
 function _M.round_robin_with_weight(name)
     if not _M.ready or not _M.data[name] then
         return nil, "upstream not ready."
